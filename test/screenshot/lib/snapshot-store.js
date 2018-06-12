@@ -46,24 +46,20 @@ class SnapshotStore {
   }
 
   /**
-   * Writes the data to the given `golden.json` file path.
-   * @param {!Array<!UploadableTestCase>} testCases
-   * @param {!Array<!ImageDiffJson>} diffs
+   * @param {!ComparisonSuiteJson} comparisonSuiteJson
    * @return {!Promise<string>}
    */
-  async getSnapshotJsonString({testCases, diffs}) {
-    const jsonData = await this.getJsonData_({testCases, diffs});
+  async getSnapshotJsonString(comparisonSuiteJson) {
+    const jsonData = await this.getJsonData_(comparisonSuiteJson);
     return stringify(jsonData, {space: '  '}) + '\n';
   }
 
   /**
-   * Writes the data to the given `golden.json` file path.
-   * @param {!Array<!UploadableTestCase>} testCases
-   * @param {!Array<!ImageDiffJson>} diffs
+   * @param {!ComparisonSuiteJson} comparisonSuiteJson
    * @return {!Promise<void>}
    */
-  async writeToDisk({testCases, diffs}) {
-    const jsonFileContent = await this.getSnapshotJsonString({testCases, diffs});
+  async writeToDisk(comparisonSuiteJson) {
+    const jsonFileContent = await this.getSnapshotJsonString(comparisonSuiteJson);
     const jsonFilePath = this.cliArgs_.goldenPath;
 
     await fs.writeFile(jsonFilePath, jsonFileContent);
@@ -143,24 +139,23 @@ class SnapshotStore {
   }
 
   /**
-   * @param {!Array<!UploadableTestCase>} testCases
-   * @param {!Array<!ImageDiffJson>} diffs
+   * @param {!ComparisonSuiteJson} comparisonSuiteJson
    * @return {!Promise<!SnapshotSuiteJson>}
    * @private
    */
-  async getJsonData_({testCases, diffs}) {
+  async getJsonData_(comparisonSuiteJson) {
     return this.cliArgs_.hasAnyFilters()
-      ? await this.updateFilteredScreenshots_({testCases, diffs})
-      : await this.updateAllScreenshots_({testCases, diffs});
+      ? await this.updateFilteredScreenshots_(comparisonSuiteJson)
+      : await this.updateAllScreenshots_(comparisonSuiteJson);
   }
 
   /**
-   * @param {!Array<!UploadableTestCase>} testCases
-   * @param {!Array<!ImageDiffJson>} diffs
+   * @param {!ComparisonSuiteJson} comparisonSuiteJson
    * @return {!Promise<!SnapshotSuiteJson>}
    * @private
    */
-  async updateFilteredScreenshots_({testCases, diffs}) {
+  async updateFilteredScreenshots_(comparisonSuiteJson) {
+    const {diffs, testCases} = comparisonSuiteJson;
     const oldJsonData = await this.fromDiffBase();
     const newJsonData = await this.fromTestCases(testCases);
     const jsonData = this.deepCloneJson_(oldJsonData);
@@ -181,12 +176,12 @@ class SnapshotStore {
   }
 
   /**
-   * @param {!Array<!UploadableTestCase>} testCases
-   * @param {!Array<!ImageDiffJson>} diffs
+   * @param {!ComparisonSuiteJson} comparisonSuiteJson
    * @return {!Promise<!SnapshotSuiteJson>}
    * @private
    */
-  async updateAllScreenshots_({testCases, diffs}) {
+  async updateAllScreenshots_(comparisonSuiteJson) {
+    const {diffs, testCases} = comparisonSuiteJson;
     const oldJsonData = await this.fromDiffBase();
     const newJsonData = await this.fromTestCases(testCases);
 
