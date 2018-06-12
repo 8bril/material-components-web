@@ -43,8 +43,8 @@ class ImageDiffer {
     const pageComparisonPromises = [];
 
     const diffs = [];
-    const added = this.getAdded_({expectedSuite, actualSuite});
-    const removed = this.getRemoved_({expectedSuite, actualSuite});
+    const added = this.getAddedToSuite_({expectedSuite, actualSuite});
+    const removed = this.getRemovedFromSuite_({expectedSuite, actualSuite});
     const unchanged = [];
 
     for (const [htmlFilePath, actualPage] of Object.entries(actualSuite)) {
@@ -204,61 +204,32 @@ class ImageDiffer {
    * @return {!Array<!ImageDiffJson>}
    * @private
    */
-  getAdded_({expectedSuite, actualSuite}) {
+  getAddedToSuite_({expectedSuite, actualSuite}) {
     const added = [];
 
     for (const [htmlFilePath, actualPage] of Object.entries(actualSuite)) {
       const expectedPage = expectedSuite[htmlFilePath];
-      if (expectedPage) {
-        added.push(...this.getAddedActualScreenshotsAsDiffObjects_({expectedPage, actualPage, htmlFilePath}));
-      } else {
-        added.push(...this.getAllActualScreenshotsAsDiffObjects_({actualPage, htmlFilePath}));
-      }
+      added.push(...this.getAddedToPage_({expectedPage, actualPage, htmlFilePath}));
     }
 
     return added;
   }
 
   /**
-   * @param {!SnapshotPageJson} expectedPage
+   * @param {?SnapshotPageJson} expectedPage
    * @param {!SnapshotPageJson} actualPage
    * @param {string} htmlFilePath
    * @return {!Array<!ImageDiffJson>}
    * @private
    */
-  getAddedActualScreenshotsAsDiffObjects_({expectedPage, actualPage, htmlFilePath}) {
+  getAddedToPage_({expectedPage, actualPage, htmlFilePath}) {
     const added = [];
 
     for (const [userAgentAlias, actualImageUrl] of Object.entries(actualPage.screenshots)) {
-      if (expectedPage.screenshots[userAgentAlias]) {
+      if (expectedPage && expectedPage.screenshots[userAgentAlias]) {
         continue;
       }
 
-      added.push({
-        htmlFilePath,
-        goldenPageUrl: null,
-        snapshotPageUrl: actualPage.publicUrl,
-        userAgentAlias,
-        actualImageUrl,
-        expectedImageUrl: null,
-        diffImageBuffer: null,
-        diffImageUrl: null,
-      });
-    }
-
-    return added;
-  }
-
-  /**
-   * @param {!SnapshotPageJson} actualPage
-   * @param {string} htmlFilePath
-   * @return {!Array<!ImageDiffJson>}
-   * @private
-   */
-  getAllActualScreenshotsAsDiffObjects_({actualPage, htmlFilePath}) {
-    const added = [];
-
-    for (const [userAgentAlias, actualImageUrl] of Object.entries(actualPage.screenshots)) {
       added.push({
         htmlFilePath,
         goldenPageUrl: null,
@@ -280,16 +251,12 @@ class ImageDiffer {
    * @return {!Array<!ImageDiffJson>}
    * @private
    */
-  getRemoved_({expectedSuite, actualSuite}) {
+  getRemovedFromSuite_({expectedSuite, actualSuite}) {
     const removed = [];
 
     for (const [htmlFilePath, expectedPage] of Object.entries(expectedSuite)) {
       const actualPage = actualSuite[htmlFilePath];
-      if (actualPage) {
-        removed.push(...this.getRemovedExpectedScreenshotsAsDiffObjects_({expectedPage, actualPage, htmlFilePath}));
-      } else {
-        removed.push(...this.getAllExpectedScreenshotsAsDiffObjects_({expectedPage, htmlFilePath}));
-      }
+      removed.push(...this.getRemovedFromPage_({expectedPage, actualPage, htmlFilePath}));
     }
 
     return removed;
@@ -297,44 +264,19 @@ class ImageDiffer {
 
   /**
    * @param {!SnapshotPageJson} expectedPage
-   * @param {!SnapshotPageJson} actualPage
+   * @param {?SnapshotPageJson} actualPage
    * @param {string} htmlFilePath
    * @return {!Array<!ImageDiffJson>}
    * @private
    */
-  getRemovedExpectedScreenshotsAsDiffObjects_({expectedPage, actualPage, htmlFilePath}) {
+  getRemovedFromPage_({expectedPage, actualPage, htmlFilePath}) {
     const removed = [];
 
     for (const [userAgentAlias, expectedImageUrl] of Object.entries(expectedPage.screenshots)) {
-      if (actualPage.screenshots[userAgentAlias]) {
+      if (actualPage && actualPage.screenshots[userAgentAlias]) {
         continue;
       }
 
-      removed.push({
-        htmlFilePath,
-        goldenPageUrl: expectedPage.publicUrl,
-        snapshotPageUrl: null,
-        userAgentAlias,
-        actualImageUrl: null,
-        expectedImageUrl,
-        diffImageBuffer: null,
-        diffImageUrl: null,
-      });
-    }
-
-    return removed;
-  }
-
-  /**
-   * @param {!SnapshotPageJson} expectedPage
-   * @param {string} htmlFilePath
-   * @return {!Array<!ImageDiffJson>}
-   * @private
-   */
-  getAllExpectedScreenshotsAsDiffObjects_({expectedPage, htmlFilePath}) {
-    const removed = [];
-
-    for (const [userAgentAlias, expectedImageUrl] of Object.entries(expectedPage.screenshots)) {
       removed.push({
         htmlFilePath,
         goldenPageUrl: expectedPage.publicUrl,
