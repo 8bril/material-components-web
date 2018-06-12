@@ -23,14 +23,14 @@ const GITHUB_REPO_URL = 'https://github.com/material-components/material-compone
 
 class ReportGenerator {
   /**
-   * @param {!ComparisonSuiteJson} comparisonSuiteJson
+   * @param {!ReportData} reportData
    */
-  constructor(comparisonSuiteJson) {
+  constructor(reportData) {
     /**
-     * @type {!ComparisonSuiteJson}
+     * @type {!ReportData}
      * @private
      */
-    this.comparisonSuiteJson_ = comparisonSuiteJson;
+    this.reportData_ = reportData;
 
     /**
      * @type {!GitRepo}
@@ -77,17 +77,17 @@ class ReportGenerator {
       });
     }
 
-    populateMap(this.comparisonSuiteJson_.diffs, this.diffMap_);
-    populateMap(this.comparisonSuiteJson_.added, this.addedMap_);
-    populateMap(this.comparisonSuiteJson_.removed, this.removedMap_);
-    populateMap(this.comparisonSuiteJson_.unchanged, this.unchangedMap_);
+    populateMap(this.reportData_.diffs, this.diffMap_);
+    populateMap(this.reportData_.added, this.addedMap_);
+    populateMap(this.reportData_.removed, this.removedMap_);
+    populateMap(this.reportData_.unchanged, this.unchangedMap_);
   }
 
   async generateHtml() {
-    const numDiffs = this.comparisonSuiteJson_.diffs.length;
-    const numAdded = this.comparisonSuiteJson_.added.length;
-    const numRemoved = this.comparisonSuiteJson_.removed.length;
-    const numUnchanged = this.comparisonSuiteJson_.unchanged.length;
+    const numDiffs = this.reportData_.diffs.length;
+    const numAdded = this.reportData_.added.length;
+    const numRemoved = this.reportData_.removed.length;
+    const numUnchanged = this.reportData_.unchanged.length;
 
     const title = [
       `${numDiffs} Diff${numDiffs !== 1 ? 's' : ''}`,
@@ -115,28 +115,28 @@ class ReportGenerator {
     ${this.getCollapseButtonMarkup_()}
     ${await this.getMetadataMarkup_()}
     ${await this.getChangelistMarkup_({
-      changelist: this.comparisonSuiteJson_.diffs,
+      changelist: this.reportData_.diffs,
       map: this.diffMap_,
       isOpen: true,
       heading: 'Diff',
       pluralize: true,
     })}
     ${await this.getChangelistMarkup_({
-      changelist: this.comparisonSuiteJson_.added,
+      changelist: this.reportData_.added,
       map: this.addedMap_,
       isOpen: true,
       heading: 'Added',
       pluralize: false,
     })}
     ${await this.getChangelistMarkup_({
-      changelist: this.comparisonSuiteJson_.removed,
+      changelist: this.reportData_.removed,
       map: this.removedMap_,
       isOpen: true,
       heading: 'Removed',
       pluralize: false,
     })}
     ${await this.getChangelistMarkup_({
-      changelist: this.comparisonSuiteJson_.unchanged,
+      changelist: this.reportData_.unchanged,
       map: this.unchangedMap_,
       isOpen: false,
       heading: 'Unchanged',
@@ -172,8 +172,8 @@ class ReportGenerator {
 
   async getMetadataMarkup_() {
     const timestamp = (new Date()).toISOString();
-    const numTestCases = this.comparisonSuiteJson_.testCases.length;
-    const numScreenshots = this.comparisonSuiteJson_.testCases
+    const numTestCases = this.reportData_.testCases.length;
+    const numScreenshots = this.reportData_.testCases
       .map((testCase) => testCase.screenshotImageFiles.length)
       .reduce((total, current) => total + current, 0)
     ;

@@ -335,17 +335,17 @@ class Controller {
   /**
    * Writes the given `testCases` to a `golden.json` file.
    * If the file already exists, it will be overwritten.
-   * @param {!ComparisonSuiteJson} comparisonSuiteJson
-   * @return {!Promise<!ComparisonSuiteJson>}
+   * @param {!ReportData} reportData
+   * @return {!Promise<!ReportData>}
    */
-  async updateGoldenJson(comparisonSuiteJson) {
-    await this.snapshotStore_.writeToDisk(comparisonSuiteJson);
-    return comparisonSuiteJson;
+  async updateGoldenJson(reportData) {
+    await this.snapshotStore_.writeToDisk(reportData);
+    return reportData;
   }
 
   /**
    * @param {!Array<!UploadableTestCase>} testCases
-   * @return {!Promise<!ComparisonSuiteJson>}
+   * @return {!Promise<!ReportData>}
    */
   async diffGoldenJson(testCases) {
     /** @type {!Array<!ImageDiffJson>} */
@@ -393,14 +393,14 @@ class Controller {
   }
 
   /**
-   * @param {!ComparisonSuiteJson} comparisonSuiteJson
+   * @param {!ReportData} reportData
    * @return {!Promise<string>}
    */
-  async uploadDiffReport(comparisonSuiteJson) {
-    const reportGenerator = new ReportGenerator(comparisonSuiteJson);
+  async uploadDiffReport(reportData) {
+    const reportGenerator = new ReportGenerator(reportData);
     const diffReportHtml = await reportGenerator.generateHtml();
-    const diffReportJsonStr = JSON.stringify(comparisonSuiteJson, null, 2);
-    const snapshotJsonStr = await this.snapshotStore_.getSnapshotJsonString(comparisonSuiteJson);
+    const diffReportJsonStr = JSON.stringify(reportData, null, 2);
+    const snapshotJsonStr = await this.snapshotStore_.getSnapshotJsonString(reportData);
 
     const writeFile = async ({filename, content, queueIndex, queueLength}) => {
       const filePath = path.join(this.cliArgs_.testDir, filename);

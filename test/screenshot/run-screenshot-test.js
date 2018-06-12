@@ -23,7 +23,7 @@ controller.initialize()
   .then(() => controller.uploadAllAssets(), handleError)
   .then((testCases) => controller.captureAllPages(testCases), handleError)
   .then((testCases) => controller.diffGoldenJson(testCases), handleError)
-  .then((comparisonSuiteJson) => controller.uploadDiffReport(comparisonSuiteJson), handleError)
+  .then((reportData) => controller.uploadDiffReport(reportData), handleError)
 ;
 
 function handleError(err) {

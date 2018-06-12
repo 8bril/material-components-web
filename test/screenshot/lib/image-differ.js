@@ -32,7 +32,7 @@ class ImageDiffer {
    * @param {!Array<!UploadableTestCase>} testCases
    * @param {!SnapshotSuiteJson} actualSuite
    * @param {!SnapshotSuiteJson} expectedSuite
-   * @return {!Promise<!ComparisonSuiteJson>}
+   * @return {!Promise<!ReportData>}
    */
   async compareAllPages({
     testCases,

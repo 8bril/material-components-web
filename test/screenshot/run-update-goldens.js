@@ -24,9 +24,9 @@ controller.initialize()
   .then((testCases) => controller.captureAllPages(testCases), handleError)
   .then((testCases) => controller.diffGoldenJson(testCases), handleError)
   .then(
-    async (comparisonSuiteJson) => {
-      await controller.uploadDiffReport(comparisonSuiteJson);
-      await controller.updateGoldenJson(comparisonSuiteJson);
+    async (reportData) => {
+      await controller.uploadDiffReport(reportData);
+      await controller.updateGoldenJson(reportData);
     },
     handleError
   )

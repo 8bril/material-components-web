@@ -86,7 +86,7 @@ let ImageDiffJson;
  *   testCases: !Array<!UploadableTestCase>,
  * }}
  */
-let ComparisonSuiteJson;
+let ReportData;
 
 
 /*
