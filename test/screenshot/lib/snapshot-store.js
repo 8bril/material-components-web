@@ -155,7 +155,7 @@ class SnapshotStore {
    * @private
    */
   async updateFilteredScreenshots_(reportData) {
-    const {diffs, testCases} = reportData;
+    const {testCases, diffs} = reportData;
     const oldJsonData = await this.fromDiffBase();
     const newJsonData = await this.fromTestCases(testCases);
     const jsonData = this.deepCloneJson_(oldJsonData);
@@ -181,7 +181,7 @@ class SnapshotStore {
    * @private
    */
   async updateAllScreenshots_(reportData) {
-    const {diffs, testCases} = reportData;
+    const {testCases, diffs} = reportData;
     const oldJsonData = await this.fromDiffBase();
     const newJsonData = await this.fromTestCases(testCases);
 

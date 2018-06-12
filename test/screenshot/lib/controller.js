@@ -454,7 +454,7 @@ class Controller {
   logUploadAllAssetsSuccess_(testCases) {
     const publicHtmlFileUrls = testCases.map((testCase) => testCase.htmlFile.publicUrl).sort();
     console.log('\n\nDONE uploading asset files to GCS!\n\n');
-    console.log(publicHtmlFileUrls.join('\n'), '\n\n');
+    console.log(publicHtmlFileUrls.join('\n') + '\n\n');
   }
 
   /**
